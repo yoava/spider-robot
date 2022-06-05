@@ -18,6 +18,10 @@
       height: 100%;
     }
 
+    #sendButton {
+      padding: 1rem;
+    }
+
     .dict {
       border: solid 1px #666666;
       background: lightgoldenrodyellow;
@@ -186,6 +190,9 @@
       return;
     }
     executing = true;
+    const sendButton = document.getElementById('sendButton');
+    sendButton.disabled = true;
+
     // store commands
     localStorage['commands'] = commandsInput.value;
 
@@ -201,6 +208,7 @@
       stepElement && (stepElement.style.background = '');
     }
     document.getElementById('done').style.background = 'yellow';
+    sendButton.disabled = false;
     executing = false;
   }
 
