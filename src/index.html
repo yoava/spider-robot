@@ -126,8 +126,7 @@
   const commandListView = document.getElementById('commandListView');
 
   function getCommands() {
-    const commandsText = commandsInput;
-    const commands = commandsText.value.split(/\s/)
+    const commands = commandsInput.value.split(/\s/)
       .map((command) => parseInt(command, 10))
       .filter((command) => command >= 0 && command <= 15);
     return commands;
@@ -166,7 +165,6 @@
       return;
     }
     executing = true;
-    const sendButton = sendButton;
     sendButton.disabled = true;
 
     // store commands
@@ -199,10 +197,11 @@
     commandListView.innerHTML = text.join('');
   }
 
-  function addCommand(id) {
-    commandsInput.value += ' ' + id;
-    event.preventDefault();
-    return false;
+  async function addCommand(id) {
+    if (!commandsInput.value.match(/.*\s$/)) {
+      commandsInput.value += ' ';
+    }
+    commandsInput.value += '' + id;
   }
 
   // send command //////////
@@ -217,18 +216,30 @@
     xhttp.send();
   }
 
+  function cancelEvent(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    setTimeout(() => window.getSelection().empty(), 0);
+  }
+
   // init elements ///////////////////////////////////////////
   commandsInput.value = localStorage['commands'] || '';
 
   // fill right command dictionary
-  document.getElementById('commandsDict').innerHTML = Object.keys(commandInfo).map((key, i) =>
-    `<div id="command_${i}" onclick="commandClicked(${i})" oncontextmenu="addCommand(${i},event)" ondblclick="addCommand(${i})"><span class="key">${i}</span><span class="value">${commandInfo[i].name}</span></div>`)
+  document.getElementById('commandsDict').innerHTML = Object.keys(commandInfo).map((command) =>
+    `<div id="command_${command}"><span class="key">${command}</span><span class="value">${commandInfo[command].name}</span></div>`)
     .join('');
+
+  Object.keys(commandInfo).forEach(command => {
+    const item = document.getElementById('command_' + command);
+    item.addEventListener('click', (e) => commandClicked(command) && cancelEvent(e));
+    item.addEventListener('contextmenu', (e) => addCommand(command) && cancelEvent(e));
+  });
 
   // init events
   sendButton.onclick = sendCommands;
-  commandsInput.onkeyup = updateCommandListView;
-  commandsInput.onchange = updateCommandListView;
+  commandsInput.addEventListener('keyup', updateCommandListView);
+  commandsInput.addEventListener('change', updateCommandListView);
   updateCommandListView();
 </script>
 </html>
