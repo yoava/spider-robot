@@ -202,6 +202,12 @@
       commandsInput.value += ' ';
     }
     commandsInput.value += '' + id;
+    updateCommandListView();
+
+    // indicate click
+    const element = document.getElementById('command_' + id);
+    element.style.background = 'lightgreen';
+    setTimeout(() => element.style.background = '', 300);
   }
 
   // send command //////////
