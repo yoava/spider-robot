@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+        name="viewport">
+  <meta content="ie=edge" http-equiv="X-UA-Compatible">
+  <title>Spider Robot</title>
+  <style>
+    body, html {
+      font-family: Arial, sans-serif;
+      height: 100%;
+    }
+
+    .wrapper {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .dict {
+      border: solid 1px #666666;
+      background: lightgoldenrodyellow;
+      display: table;
+    }
+
+    .dict div {
+      display: table-row;
+    }
+
+    .dict span {
+      display: table-cell;
+      border-bottom: solid 1px #aaaaaa;
+      padding: 0.5rem 0.5rem;
+    }
+
+    .dict .key {
+      text-align: right;
+    }
+
+    .commands {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      padding-right: 0.5rem;
+    }
+
+    .commands textarea {
+      flex: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    #commandListView {
+      margin: 0.5rem 0;
+      background: #fefefe;
+      border: solid 1px #aaaaaa;
+      flex: 1;
+      font-size: 0.7rem;
+      color: #aaaaaa;
+      font-weight: bold;
+    }
+
+    #commandListView span {
+      display: inline-block;
+      margin: 0.2rem;
+      padding: 0 0.5rem;
+      background: #fafafa;
+      border: solid 1px #aaaaaa;
+      border-radius: 2px;
+    }
+
+    #commandListView span, #commandListView div {
+      font-size: 0.9rem;
+      color: black;
+      font-weight: normal;
+    }
+
+    #commandListView div {
+      padding: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+  <div style="display: flex;">
+    <div class="commands">
+      <textarea id="commands"></textarea>
+      <button id="sendButton">Send</button>
+    </div>
+    <div>
+      <div class="dict">
+        <div id="command_0" onclick="commandClicked(0)"><span class="key"> 0</span><span class="value">Wait</span></div>
+        <div id="command_1" onclick="commandClicked(1)"><span class="key"> 1</span><span class="value">Stand</span>
+        </div>
+        <div id="command_2" onclick="commandClicked(2)"><span class="key"> 2</span><span class="value">Forward</span>
+        </div>
+        <div id="command_3" onclick="commandClicked(3)"><span class="key"> 3</span><span class="value">Backward</span>
+        </div>
+        <div id="command_4" onclick="commandClicked(4)"><span class="key"> 4</span><span class="value">Left shift</span>
+        </div>
+        <div id="command_5" onclick="commandClicked(5)"><span class="key"> 5</span><span
+          class="value">Right shift</span>
+        </div>
+        <div id="command_6" onclick="commandClicked(6)"><span class="key"> 6</span><span class="value">Turn left</span>
+        </div>
+        <div id="command_7" onclick="commandClicked(7)"><span class="key"> 7</span><span class="value">Turn right</span>
+        </div>
+        <div id="command_8" onclick="commandClicked(8)"><span class="key"> 8</span><span class="value">Lie</span></div>
+        <div id="command_9" onclick="commandClicked(9)"><span class="key"> 9</span><span class="value">Say Hi</span>
+        </div>
+        <div id="command_10" onclick="commandClicked(10)"><span class="key">10</span><span class="value">Fight</span>
+        </div>
+        <div id="command_11" onclick="commandClicked(11)"><span class="key">11</span><span class="value">Push up</span>
+        </div>
+        <div id="command_12" onclick="commandClicked(12)"><span class="key">12</span><span class="value">Sleep</span>
+        </div>
+        <div id="command_13" onclick="commandClicked(13)"><span class="key">13</span><span class="value">Dance1</span>
+        </div>
+        <div id="command_14" onclick="commandClicked(14)"><span class="key">14</span><span class="value">Dance2</span>
+        </div>
+        <div id="command_15" onclick="commandClicked(15)"><span class="key">15</span><span class="value">Dance3</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="commandListView"></div>
+</div>
+</body>
+<script>
+
+  const commandInfo = {
+    0: { name: 'Wait', duration: 1 },
+    1: { name: 'Stand', duration: 1 },
+    2: { name: 'Forward', duration: 1.15 },
+    3: { name: 'Backward', duration: 1.15 },
+    4: { name: 'Left shift', duration: 1.15 },
+    5: { name: 'Right shift', duration: 1.15 },
+    6: { name: 'Turn left', duration: 0.8 },
+    7: { name: 'Turn right', duration: 0.8 },
+    8: { name: 'Lie', duration: 0.5 },
+    9: { name: 'Say Hi', duration: 1.55 },
+    10: { name: 'Fight', duration: 2.1 },
+    11: { name: 'Push up', duration: 7.3 },
+    12: { name: 'Sleep', duration: 1.5 },
+    13: { name: 'Dance1', duration: 2.9 },
+    14: { name: 'Dance2', duration: 2.7 },
+    15: { name: 'Dance3', duration: 3 },
+  };
+
+  let executing = false;
+
+  const commandsInput = document.getElementById('commands');
+
+  function getCommands() {
+    const commandsText = commandsInput;
+    const commands = commandsText.value.split(/\s/)
+      .map((command) => parseInt(command, 10))
+      .filter((command) => command >= 0 && command <= 15);
+    return commands;
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function commandClicked(id) {
+    if (!executing) {
+      sendCommand(id);
+    }
+  }
+
+  async function sendCommand(id) {
+    const command = parseInt(id, 10);
+    console.info(`Command ${command} "${commandInfo[command].name}"`);
+    const commandElement = document.getElementById('command_' + command);
+    commandElement && (commandElement.style.background = 'yellow');
+    if (command >= 1 && command <= 15) {
+      controlPm(id);
+    }
+    await sleep(commandInfo[command].duration * 1000);
+    commandElement && (commandElement.style.background = '');
+  }
+
+  async function sendCommands() {
+    if (executing) {
+      return;
+    }
+    executing = true;
+    // store commands
+    localStorage['commands'] = commandsInput.value;
+
+    updateCommandListView();
+
+    // execute commands
+    const commands = getCommands();
+    let step = 0;
+    for (const command of commands) {
+      const stepElement = document.getElementById('step_' + (step++));
+      stepElement && (stepElement.style.background = 'yellow');
+      await sendCommand(command);
+      stepElement && (stepElement.style.background = '');
+    }
+    document.getElementById('done').style.background = 'yellow';
+    executing = false;
+  }
+
+  function updateCommandListView() {
+    const commands = getCommands();
+    const text = commands.map((command, index) => `<span id="step_${index}">${commandInfo[command].name}</span>>`);
+    if (commands.length === 0) {
+      text.push('<div>No commands.</div><div> Please enter commands and click [Send]</div>');
+    } else {
+      text.push('<span id="done">Done</span>');
+    }
+    document.getElementById('commandListView').innerHTML = text.join('');
+  }
+
+  function controlPm(id) {
+    const xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (xhttp.readyState == 4 && xhttp.status == 200) {
+      }
+    };
+    xhttp.open('GET', 'http://192.168.4.1./controller?pm=' + id, true);
+    xhttp.send();
+  }
+
+  function controlPms(id) {
+    const xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (xhttp.readyState == 4 && xhttp.status == 200) {
+      }
+    };
+    xhttp.open('GET', 'controller?pms=' + id, true);
+    xhttp.send();
+  }
+
+  document.getElementById('sendButton').onclick = sendCommands;
+  commandsInput.onkeyup = updateCommandListView;
+  commandsInput.onchange = updateCommandListView;
+  commandsInput.value = localStorage['commands'] || '';
+  updateCommandListView();
+</script>
+</html>

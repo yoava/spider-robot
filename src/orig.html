@@ -1,0 +1,115 @@
+<html>
+<head><title>Spider Robot</title>
+  <meta charset="UTF-8">
+  <meta content="width=device-width" name="viewport">
+  <style type="text/css">body {
+    margin: 0px;
+    backgound-color: #FFFFFF;
+    font-family: helvetica, arial;
+    font-size: 100%;
+    color: #555555;
+  }
+
+  td {
+    text-align: center;
+  }
+
+  span {
+    font-family: helvetica, arial;
+    font-size: 70%;
+    color: #777777;
+  }
+
+  button {
+    width: 90%;
+    height: 90%;
+    font-family: helvetica, arial;
+    font-size: 100%;
+    color: #555555;
+    background: #BFDFFF;
+    padding: 5px 5px 5px 5px;
+    border: none;
+  }</style>
+</head>
+<body><br>
+<table height="90%" width="100%">
+  <tr height="19%">
+    <td width="33%">
+      <button onclick=controlPm(6) style=background:#BFFFCF type="button">Turn left</button>
+    </td>
+    <td width="33%">
+      <button onclick=controlPm(2) type="button">Forward</button>
+    </td>
+    <td width="33%">
+      <button onclick=controlPm(7) style=background:#BFFFCF type="button">Turn right</button>
+    </td>
+  </tr>
+  <tr height="19%">
+    <td>
+      <button onclick=controlPm(4) type="button">Left shift</button>
+    </td>
+    <td>
+      <button onclick=controlPm(3) type="button">Backward</button>
+    </td>
+    <td>
+      <button onclick=controlPm(5) type="button">Right shift</button>
+    </td>
+  </tr>
+  <tr height="5%">
+    <td colspan="3"><span><br></span></td>
+  </tr>
+  <tr height="20%">
+    <td>
+      <button onclick=controlPm(1) style=background:#FFCC99 type="button">Stand</button>
+    </td>
+    <td>
+      <button onclick=controlPm(9) style=background:#FFE599 type="button">Say Hi</button>
+    </td>
+    <td>
+      <button onclick=controlPm(11) style=background:#FFE599 type="button">Push up</button>
+    </td>
+  </tr>
+  <tr height="19%">
+    <td>
+      <button onclick=controlPm(8) style=background:#FFE599 type="button">Lie</button>
+    </td>
+    <td>
+      <button onclick=controlPm(10) style=background:#FFE599 type="button">Fighting</button>
+    </td>
+    <td>
+      <button onclick=controlPm(12) style=background:#FFBFBF type="button">Sleep</button>
+    </td>
+  </tr>
+  <tr height="19%">
+    <td>
+      <button onclick=controlPm(13) style=background:#CFBFFF type="button">Dance1</button>
+    </td>
+    <td>
+      <button onclick=controlPm(14) style=background:#CFBFFF type="button">Dance2</button>
+    </td>
+    <td>
+      <button onclick=controlPm(15) style=background:#CFBFFF type="button">Dance3</button>
+    </td>
+  </tr>
+</table>
+<span><p align="center">STEM - Spider Robot</p></span></body>
+<script>function controlPm(id) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (xhttp.readyState == 4 && xhttp.status == 200) {
+    }
+  };
+  xhttp.open('GET', 'controller?pm=' + id, true);
+  xhttp.send();
+}
+
+function controlPms(id) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (xhttp.readyState == 4 && xhttp.status == 200) {
+    }
+  };
+  xhttp.open('GET', 'controller?pms=' + id, true);
+  xhttp.send();
+}</script>
+</html>
