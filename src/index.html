@@ -92,39 +92,7 @@
       <button id="sendButton">Send</button>
     </div>
     <div>
-      <div class="dict">
-        <div id="command_0" onclick="commandClicked(0)"><span class="key"> 0</span><span class="value">Wait</span></div>
-        <div id="command_1" onclick="commandClicked(1)"><span class="key"> 1</span><span class="value">Stand</span>
-        </div>
-        <div id="command_2" onclick="commandClicked(2)"><span class="key"> 2</span><span class="value">Forward</span>
-        </div>
-        <div id="command_3" onclick="commandClicked(3)"><span class="key"> 3</span><span class="value">Backward</span>
-        </div>
-        <div id="command_4" onclick="commandClicked(4)"><span class="key"> 4</span><span class="value">Left shift</span>
-        </div>
-        <div id="command_5" onclick="commandClicked(5)"><span class="key"> 5</span><span
-          class="value">Right shift</span>
-        </div>
-        <div id="command_6" onclick="commandClicked(6)"><span class="key"> 6</span><span class="value">Turn left</span>
-        </div>
-        <div id="command_7" onclick="commandClicked(7)"><span class="key"> 7</span><span class="value">Turn right</span>
-        </div>
-        <div id="command_8" onclick="commandClicked(8)"><span class="key"> 8</span><span class="value">Lie</span></div>
-        <div id="command_9" onclick="commandClicked(9)"><span class="key"> 9</span><span class="value">Say Hi</span>
-        </div>
-        <div id="command_10" onclick="commandClicked(10)"><span class="key">10</span><span class="value">Fight</span>
-        </div>
-        <div id="command_11" onclick="commandClicked(11)"><span class="key">11</span><span class="value">Push up</span>
-        </div>
-        <div id="command_12" onclick="commandClicked(12)"><span class="key">12</span><span class="value">Sleep</span>
-        </div>
-        <div id="command_13" onclick="commandClicked(13)"><span class="key">13</span><span class="value">Dance1</span>
-        </div>
-        <div id="command_14" onclick="commandClicked(14)"><span class="key">14</span><span class="value">Dance2</span>
-        </div>
-        <div id="command_15" onclick="commandClicked(15)"><span class="key">15</span><span class="value">Dance3</span>
-        </div>
-      </div>
+      <div class="dict" id="commandsDict"></div>
     </div>
   </div>
   <div id="commandListView"></div>
@@ -154,6 +122,8 @@
   let executing = false;
 
   const commandsInput = document.getElementById('commands');
+  const sendButton = document.getElementById('sendButton');
+  const commandListView = document.getElementById('commandListView');
 
   function getCommands() {
     const commandsText = commandsInput;
@@ -167,10 +137,16 @@
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  function commandClicked(id) {
-    if (!executing) {
-      sendCommand(id);
+
+  async function commandClicked(id) {
+    if (executing) {
+      return;
     }
+    executing = true;
+    sendButton.disabled = true;
+    await sendCommand(id);
+    sendButton.disabled = false;
+    executing = false;
   }
 
   async function sendCommand(id) {
@@ -190,7 +166,7 @@
       return;
     }
     executing = true;
-    const sendButton = document.getElementById('sendButton');
+    const sendButton = sendButton;
     sendButton.disabled = true;
 
     // store commands
@@ -220,33 +196,39 @@
     } else {
       text.push('<span id="done">Done</span>');
     }
-    document.getElementById('commandListView').innerHTML = text.join('');
+    commandListView.innerHTML = text.join('');
   }
 
+  function addCommand(id) {
+    commandsInput.value += ' ' + id;
+    event.preventDefault();
+    return false;
+  }
+
+  // send command //////////
   function controlPm(id) {
     const xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
       if (xhttp.readyState == 4 && xhttp.status == 200) {
       }
     };
+    // xhttp.open('GET', 'http://192.168.4.1./controller?pms=' + id, true);
     xhttp.open('GET', 'http://192.168.4.1./controller?pm=' + id, true);
     xhttp.send();
   }
 
-  function controlPms(id) {
-    const xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-      if (xhttp.readyState == 4 && xhttp.status == 200) {
-      }
-    };
-    xhttp.open('GET', 'controller?pms=' + id, true);
-    xhttp.send();
-  }
+  // init elements ///////////////////////////////////////////
+  commandsInput.value = localStorage['commands'] || '';
 
-  document.getElementById('sendButton').onclick = sendCommands;
+  // fill right command dictionary
+  document.getElementById('commandsDict').innerHTML = Object.keys(commandInfo).map((key, i) =>
+    `<div id="command_${i}" onclick="commandClicked(${i})" oncontextmenu="addCommand(${i},event)" ondblclick="addCommand(${i})"><span class="key">${i}</span><span class="value">${commandInfo[i].name}</span></div>`)
+    .join('');
+
+  // init events
+  sendButton.onclick = sendCommands;
   commandsInput.onkeyup = updateCommandListView;
   commandsInput.onchange = updateCommandListView;
-  commandsInput.value = localStorage['commands'] || '';
   updateCommandListView();
 </script>
 </html>
